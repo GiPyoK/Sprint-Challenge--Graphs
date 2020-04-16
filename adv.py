@@ -5,6 +5,32 @@ from world import World
 import random
 from ast import literal_eval
 
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
+
+# Helper funtions
+def opposite_direction(direction):
+    if direction == 'n':
+        return 's'
+    elif direction == 's':
+        return 'n'
+    elif direction == 'e':
+        return 'w'
+    elif direction == 'w':
+        return 'e'
+    else:
+        return None
+
 # Load world
 world = World()
 
@@ -31,26 +57,36 @@ traversal_path = []
 
 # Create a Q and enqueue starting vertex
 qq = Queue()
-qq.enqueue([starting_room])
+qq.enqueue(player.current_room)
 # Create a set of traversed vertices
 visited = set()
+# Create a traversal graph
+traversal_graph = {}
 # While queue is not empty
 while qq.size() > 0:
     # dequeue/pop the first vertex
-    path = qq.dequeue()
+    current_room = qq.dequeue()
+    player.current_room = current_room
     # if not visited
-    if path[-1] not in visited:
-        # Do the thing here
-        print(path[-1])
+    if current_room.id not in visited:
+        # Add to traversal graph
+        if current_room.id not in traversal_graph:
+            traversal_graph[current_room.id] = {}
         # Mark as visited
-        visited.add(path[-1])
+        visited.add(current_room.id)
         # enqueue all neighbors
-        for next_vert in self.get_neighbors(path[-1]):
-            new_path = list(path)
-            new_path.append(next_vert)
-            qq.enqueue(new_path)
+        for direction in current_room.get_exits():
+            # Move to exit
+            player.travel(direction)
+            # Record the path
+            traversal_graph[current_room.id][direction] = player.current_room.id
+            # Enqueue exits that are not yet visited (BFT)
+            if player.current_room.id not in visited:
+                qq.enqueue(player.current_room)
+            # Move back to previous room
+            player.travel(opposite_direction(direction))
 
-
+breakpoint()
 
 # TRAVERSAL TEST
 visited_rooms = set()
@@ -82,15 +118,3 @@ else:
 #     else:
 #         print("I did not understand that command.")
 
-class Queue():
-    def __init__(self):
-        self.queue = []
-    def enqueue(self, value):
-        self.queue.append(value)
-    def dequeue(self):
-        if self.size() > 0:
-            return self.queue.pop(0)
-        else:
-            return None
-    def size(self):
-        return len(self.queue)
