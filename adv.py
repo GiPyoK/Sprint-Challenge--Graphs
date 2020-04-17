@@ -32,7 +32,7 @@ class Stack():
     def size(self):
         return len(self.stack)
 
-# Helper funtions
+# Helper funtion
 def opposite_direction(direction):
     if direction == 'n':
         return 's'
@@ -71,8 +71,7 @@ traversal_path = []
 
 # Construct a traversal graph
 traversal_graph = {}
-# Create a Q and enqueue starting vertex
-qq = Queue()
+# Create a stack and push starting vertex
 stack = Stack()
 stack.push(player.current_room)
 # Create a set of traversed vertices
@@ -81,9 +80,11 @@ visited = set()
 reverse_path = []
 # While queue is not empty
 while stack.size() > 0:
-    # print(stack.stack)
-    # print(reverse_path)
-    # dequeue/pop the first vertex
+    # exit out of the loop if all rooms are visited
+    if len(visited) == len(room_graph):
+        break
+
+    # pop the first vertex
     current_room = stack.pop()
 
     # if current room is alread visted, move back
@@ -111,12 +112,7 @@ while stack.size() > 0:
         if len(unvisited) == 0:
             visited.add(current_room.id)
             continue
-            # Move back to previous room
-            # if len(reverse_path) > 0:
-            #     move_back = reverse_path.pop()
-            #     player.travel(move_back)
-            #     traversal_path.append(move_back)
-            # continue
+
         # Move to random direction
         random.shuffle(unvisited)
         player.travel(unvisited[0])
@@ -130,23 +126,6 @@ while stack.size() > 0:
         traversal_graph[player.current_room.id][opposite_direction(unvisited[0])] = current_room.id
         stack.push(player.current_room)
         reverse_path.append(opposite_direction(unvisited[0]))
-
-        # # Mark as visited
-        # visited.add(current_room.id)
-        # # enqueue all neighbors
-        # for direction in current_room.get_exits():
-        #     # Move to exit
-        #     player.travel(direction)
-        #     # Record the path
-        #     traversal_graph[current_room.id][direction] = player.current_room.id
-        #     # Enqueue exits that are not yet visited (BFT)
-        #     if player.current_room.id not in visited:
-        #         stack.push(player.current_room)
-        #     # Move back to previous room
-        #     player.travel(opposite_direction(direction))
-
-print(len(traversal_graph))
-
 
 # TRAVERSAL TEST
 visited_rooms = set()
