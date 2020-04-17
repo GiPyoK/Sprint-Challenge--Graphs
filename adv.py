@@ -3,6 +3,7 @@ from player import Player
 from world import World
 
 import random
+import os
 from ast import literal_eval
 
 class Queue():
@@ -47,7 +48,7 @@ def opposite_direction(direction):
 # Load world
 world = World()
 
-
+script_dir = os.path.dirname(__file__)
 # You may uncomment the smaller graphs for development and testing purposes.
 # map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
@@ -56,7 +57,7 @@ world = World()
 map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
-room_graph=literal_eval(open(map_file, "r").read())
+room_graph=literal_eval(open(os.path.join(script_dir, map_file), "r").read())
 world.load_graph(room_graph)
 
 # Print an ASCII map
@@ -80,12 +81,19 @@ visited = set()
 reverse_path = []
 # While queue is not empty
 while stack.size() > 0:
-    print(stack.stack)
-    print(reverse_path)
+    # print(stack.stack)
+    # print(reverse_path)
     # dequeue/pop the first vertex
     current_room = stack.pop()
+
+    # if current room is alread visted, move back
+    if current_room.id in visited:
+        if len(reverse_path) > 0:
+            move_back = reverse_path.pop()
+            player.travel(move_back)
+            traversal_path.append(move_back)
     # if not visited
-    if current_room.id not in visited:
+    else:
         # push to stack
         stack.push(current_room)
         # Add to traversal graph
@@ -102,12 +110,13 @@ while stack.size() > 0:
         # if all of the directions are visited, append to visited set
         if len(unvisited) == 0:
             visited.add(current_room.id)
-            # Move back to previous room
-            if len(reverse_path) > 0:
-                move_back = reverse_path.pop()
-                player.travel(move_back)
-                traversal_path.append(move_back)
             continue
+            # Move back to previous room
+            # if len(reverse_path) > 0:
+            #     move_back = reverse_path.pop()
+            #     player.travel(move_back)
+            #     traversal_path.append(move_back)
+            # continue
         # Move to random direction
         random.shuffle(unvisited)
         player.travel(unvisited[0])
