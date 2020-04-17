@@ -78,7 +78,7 @@ stack.push(player.current_room)
 visited = set()
 # Create an array for moving to previous room
 reverse_path = []
-# While queue is not empty
+# While stack is not empty
 while stack.size() > 0:
     # exit out of the loop if all rooms are visited
     if len(visited) == len(room_graph):
@@ -87,7 +87,7 @@ while stack.size() > 0:
     # pop the first vertex
     current_room = stack.pop()
 
-    # if current room is alread visted, move back
+    # if current room is already visted, move back
     if current_room.id in visited:
         if len(reverse_path) > 0:
             move_back = reverse_path.pop()
